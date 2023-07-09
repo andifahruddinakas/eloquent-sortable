@@ -2,29 +2,36 @@
 
 namespace Akas\EloquentSortable;
 
+use ArrayAccess;
 use Illuminate\Database\Eloquent\Builder;
 use InvalidArgumentException;
 
 trait SortableTrait
 {
+    public function __construct()
+    {
+        parent::__construct();
+        get_instance()->load->config('eloquent-sortable');
+    }
+
     public static function bootSortableTrait()
     {
         parent::boot();
 
-        static::creating(function ($model) {
+        static::creating(static function ($model) {
             if ($model instanceof Sortable && $model->shouldSortWhenCreating()) {
                 $model->setHighestOrderNumber();
             }
         });
 
-        static::deleted(function ($model) {
+        static::deleted(static function ($model) {
             if ($model instanceof Sortable) {
                 $model->decrementOrderAfterDelete();
                 $model->reorderRemaining();
             }
         });
 
-        static::forceDeleted(function ($model) {
+        static::forceDeleted(static function ($model) {
             if ($model instanceof Sortable) {
                 $model->reorderRemaining();
             }
@@ -33,19 +40,19 @@ trait SortableTrait
 
     public function getOrderColumnName(): string
     {
-        return $this->sortable['order_column_name'] ?? config('eloquent-sortable.order_column_name', 'order_column');
+        return config_item('order_column_name') ?? 'order_column';
     }
 
     public function shouldSortWhenCreating(): bool
     {
-        return $this->sortable['sort_when_creating'] ?? config('eloquent-sortable.sort_when_creating', true);
+        return config_item('sort_when_creating') ?? true;
     }
 
     public function setHighestOrderNumber(): void
     {
         $orderColumnName = $this->getOrderColumnName();
 
-        $this->$orderColumnName = $this->getHighestOrderNumber() + 1;
+        $this->{$orderColumnName} = $this->getHighestOrderNumber() + 1;
     }
 
     public function getHighestOrderNumber(): int
@@ -68,9 +75,9 @@ trait SortableTrait
         return $query->orderBy($this->getOrderColumnName(), $direction);
     }
 
-    public static function setNewOrder($ids, int $startOrder = 1, string $primaryKeyColumn = null): void
+    public static function setNewOrder($ids, int $startOrder = 1, ?string $primaryKeyColumn = null): void
     {
-        if (! is_array($ids) && ! $ids instanceof \ArrayAccess) {
+        if (! is_array($ids) && ! $ids instanceof ArrayAccess) {
             throw new InvalidArgumentException('You must pass an array or ArrayAccess object to setNewOrder');
         }
 
@@ -78,7 +85,7 @@ trait SortableTrait
 
         $orderColumnName = $model->getOrderColumnName();
 
-        if (is_null($primaryKeyColumn)) {
+        if (null === $primaryKeyColumn) {
             $primaryKeyColumn = $model->getKeyName();
         }
 
@@ -99,7 +106,7 @@ trait SortableTrait
         $orderColumnName = $this->getOrderColumnName();
 
         $swapWithModel = $this->buildSortQuery()
-            ->where($orderColumnName, '<', $this->$orderColumnName)
+            ->where($orderColumnName, '<', $this->{$orderColumnName})
             ->ordered('desc')
             ->first();
 
@@ -115,7 +122,7 @@ trait SortableTrait
         $orderColumnName = $this->getOrderColumnName();
 
         $swapWithModel = $this->buildSortQuery()
-            ->where($orderColumnName, '>', $this->$orderColumnName)
+            ->where($orderColumnName, '>', $this->{$orderColumnName})
             ->ordered()
             ->first();
 
@@ -130,12 +137,12 @@ trait SortableTrait
     {
         $orderColumnName = $this->getOrderColumnName();
 
-        $oldOrderOfOtherModel = $otherModel->$orderColumnName;
+        $oldOrderOfOtherModel = $otherModel->{$orderColumnName};
 
-        $otherModel->$orderColumnName = $this->$orderColumnName;
+        $otherModel->{$orderColumnName} = $this->{$orderColumnName};
         $otherModel->save();
 
-        $this->$orderColumnName = $oldOrderOfOtherModel;
+        $this->{$orderColumnName} = $oldOrderOfOtherModel;
         $this->save();
 
         return $this;
@@ -152,13 +159,13 @@ trait SortableTrait
 
         $orderColumnName = $this->getOrderColumnName();
 
-        if ($this->$orderColumnName === $maxOrder) {
+        if ($this->{$orderColumnName} === $maxOrder) {
             return $this;
         }
 
-        $oldOrder = $this->$orderColumnName;
+        $oldOrder = $this->{$orderColumnName};
 
-        $this->$orderColumnName = $maxOrder;
+        $this->{$orderColumnName} = $maxOrder;
         $this->save();
 
         $this->buildSortQuery()
@@ -181,7 +188,7 @@ trait SortableTrait
 
         $orderColumnName = $this->getOrderColumnName();
 
-        $this->$orderColumnName = $firstModel->$orderColumnName;
+        $this->{$orderColumnName} = $firstModel->{$orderColumnName};
         $this->save();
 
         $this->buildSortQuery()
@@ -195,30 +202,30 @@ trait SortableTrait
     {
         $orderColumnName = $this->getOrderColumnName();
 
-        return (int) $this->$orderColumnName === $this->getLowestOrderNumber();
+        return (int) $this->{$orderColumnName} === $this->getLowestOrderNumber();
     }
 
     public function isLastInOrder(): bool
     {
         $orderColumnName = $this->getOrderColumnName();
 
-        return (int) $this->$orderColumnName === $this->getHighestOrderNumber();
+        return (int) $this->{$orderColumnName} === $this->getHighestOrderNumber();
     }
 
     public function moveBefore(Sortable $model): self
     {
         $orderColumnName = $this->getOrderColumnName();
 
-        if ($model->$orderColumnName === $this->$orderColumnName) {
+        if ($model->{$orderColumnName} === $this->{$orderColumnName}) {
             return $this;
         }
 
         $this->buildSortQuery()
-            ->where($orderColumnName, '>=', $model->$orderColumnName)
-            ->where($orderColumnName, '<', $this->$orderColumnName)
+            ->where($orderColumnName, '>=', $model->{$orderColumnName})
+            ->where($orderColumnName, '<', $this->{$orderColumnName})
             ->increment($orderColumnName);
 
-        $this->$orderColumnName = $model->$orderColumnName;
+        $this->{$orderColumnName} = $model->{$orderColumnName};
         $this->save();
 
         return $this;
@@ -228,16 +235,16 @@ trait SortableTrait
     {
         $orderColumnName = $this->getOrderColumnName();
 
-        if ($model->$orderColumnName === $this->$orderColumnName) {
+        if ($model->{$orderColumnName} === $this->{$orderColumnName}) {
             return $this;
         }
 
         $this->buildSortQuery()
-            ->where($orderColumnName, '>', $model->$orderColumnName)
-            ->where($orderColumnName, '<=', $this->$orderColumnName)
+            ->where($orderColumnName, '>', $model->{$orderColumnName})
+            ->where($orderColumnName, '<=', $this->{$orderColumnName})
             ->decrement($orderColumnName);
 
-        $this->$orderColumnName = $model->$orderColumnName;
+        $this->{$orderColumnName} = $model->{$orderColumnName};
         $this->save();
 
         return $this;
@@ -248,7 +255,7 @@ trait SortableTrait
         $orderColumnName = $this->getOrderColumnName();
 
         $this->buildSortQuery()
-            ->where($orderColumnName, '>', $this->$orderColumnName)
+            ->where($orderColumnName, '>', $this->{$orderColumnName})
             ->decrement($orderColumnName);
     }
 
@@ -261,7 +268,7 @@ trait SortableTrait
             ->get();
 
         foreach ($remainingModels as $index => $model) {
-            $model->$orderColumnName = $index + 1;
+            $model->{$orderColumnName} = $index + 1;
             $model->save();
         }
     }
@@ -270,7 +277,7 @@ trait SortableTrait
     {
         $orderColumnName = $this->getOrderColumnName();
 
-        $currentPosition = $this->$orderColumnName;
+        $currentPosition = $this->{$orderColumnName};
 
         if ($position === $currentPosition) {
             return $this;
@@ -288,7 +295,7 @@ trait SortableTrait
                 ->decrement($orderColumnName);
         }
 
-        $this->$orderColumnName = $position;
+        $this->{$orderColumnName} = $position;
         $this->save();
 
         return $this;

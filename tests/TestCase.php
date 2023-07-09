@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\EloquentSortable\Test;
+namespace Akas\EloquentSortable\Test;
 
 use Illuminate\Database\Schema\Blueprint;
 use Orchestra\Testbench\TestCase as Orchestra;

@@ -1,11 +1,11 @@
 <?php
 
-namespace Spatie\EloquentSortable\Test;
+namespace Akas\EloquentSortable\Test;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\EloquentSortable\Sortable;
-use Spatie\EloquentSortable\SortableTrait;
+use Akas\EloquentSortable\Sortable;
+use Akas\EloquentSortable\SortableTrait;
 
 class DummyWithSoftDeletes extends Model implements Sortable
 {

@@ -1,27 +1,15 @@
 # Sortable behaviour for Eloquent models
 
-[![Latest Version](https://img.shields.io/github/release/spatie/eloquent-sortable.svg?style=flat-square)](https://github.com/spatie/eloquent-sortable/releases)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/spatie/eloquent-sortable/run-tests.yml?branch=main&label=tests)
+[![Latest Version](https://img.shields.io/github/release/akas/eloquent-sortable.svg?style=flat-square)](https://github.com/akas/eloquent-sortable/releases)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/akas/eloquent-sortable/run-tests.yml?branch=main&label=tests)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Total Downloads](https://img.shields.io/packagist/dt/spatie/eloquent-sortable.svg?style=flat-square)](https://packagist.org/packages/spatie/eloquent-sortable)
+[![Total Downloads](https://img.shields.io/packagist/dt/akas/eloquent-sortable.svg?style=flat-square)](https://packagist.org/packages/akas/eloquent-sortable)
 
 This package provides a trait that adds sortable behaviour to an Eloquent model.
 
 The value of the order column of a new record of a model is determined by the maximum value of the order column of all records of that model + 1.
 
 The package also provides a query scope to fetch all the records in the right order.
-
-Spatie is a webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
-
-## Support us
-
-Learn how to create a package like this one, by watching our premium video course:
-
-[![Laravel Package training](https://spatie.be/github/package-training.jpg)](https://laravelpackage.training)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
 
 ## Installation
 
@@ -30,7 +18,7 @@ We highly appreciate you sending us a postcard from your hometown, mentioning wh
 This package can be installed through Composer.
 
 ```
-composer require spatie/eloquent-sortable
+composer require akas/eloquent-sortable
 ```
 
 In Laravel 5.5 and above the service provider will automatically get registered. In older versions of the framework just add the service provider in `config/app.php` file:
@@ -38,7 +26,7 @@ In Laravel 5.5 and above the service provider will automatically get registered.
 ```php
 'providers' => [
     ...
-    Spatie\EloquentSortable\EloquentSortableServiceProvider::class,
+    Akas\EloquentSortable\EloquentSortableServiceProvider::class,
 ];
 ```
 
@@ -68,15 +56,15 @@ return [
 ## Usage
 
 To add sortable behaviour to your model you must:
-1. Implement the `Spatie\EloquentSortable\Sortable` interface.
-2. Use the trait `Spatie\EloquentSortable\SortableTrait`.
+1. Implement the `Akas\EloquentSortable\Sortable` interface.
+2. Use the trait `Akas\EloquentSortable\SortableTrait`.
 3. Optionally specify which column will be used as the order column. The default is `order_column`.
 
 ### Example
 
 ```php
-use Spatie\EloquentSortable\Sortable;
-use Spatie\EloquentSortable\SortableTrait;
+use Akas\EloquentSortable\Sortable;
+use Akas\EloquentSortable\SortableTrait;
 
 class MyModel extends Model implements Sortable
 {
@@ -219,7 +207,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ## Contributing
 
-Please see [CONTRIBUTING](https://github.com/spatie/.github/blob/main/CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](https://github.com/akas/.github/blob/main/CONTRIBUTING.md) for details.
 
 ## Security Vulnerabilities
 
